@@ -1,0 +1,35 @@
+#!/usr/bin/groovy
+
+package shared_lib
+
+import shared_lib.common.utilities.stageUtils
+import config.Global
+
+def build(config) {
+    // This method is not needed for unit tests only.
+}
+
+def unitTest(config) {
+    stage(Global.instance.stageUnitTest) {
+        if (Global.instance.unitTest == 'true') {
+            try {
+                def mavenHome = tool name: 'M3', type: 'hudson.tasks.Maven$MavenInstallation'
+                def cmds = Global.instance.javaUnitTestCommand.split("&&")
+                for (def cmd : cmds) {
+                    def trimmedCmd = cmd.trim().replaceAll("^mvn\\s+", "")
+                    steps.sh """
+                    ${mavenHome}/bin/mvn ${trimmedCmd}
+                    """
+                }
+            } catch (Exception e) {
+                currentBuild.result = "FAILURE"
+                throw e
+            } finally {
+                // notification
+            }
+        } else {
+            // new stageUtils(steps).skipStage(Global.instance.stageUnitTest)
+            echo "Skipping Unit Test stage"
+        }
+    }
+}

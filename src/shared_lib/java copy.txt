@@ -1,0 +1,33 @@
+#!/usr/bin/groovy
+
+package shared_lib
+
+import shared_lib.common.utilities.stageUtils
+import config.Global
+
+def build(config) {
+    // This method is not needed for unit tests only.
+}
+
+def unitTest(config) {
+    stage(Global.instance.stageUnitTest) {
+        if ("${Global.instance.unitTest}" == 'true') {
+            try {
+                def cmds = "${Global.instance.javaUnitTestCommand}".split("&&")
+                for (def cmd : cmds) {
+                    steps.sh """
+                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+                    ${cmd}
+                    """
+                }
+            } catch (Exception e) {
+                currentBuild.result = "FAILURE"
+                throw e
+            } finally {
+                // notification
+            }
+        } else {
+            new stageUtils(steps).skipStage(Global.instance.stageUnitTest)
+        }
+    }
+}
