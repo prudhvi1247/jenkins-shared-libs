@@ -39,7 +39,7 @@ def call(body) {
         currentBuild.result = "FAILURE"
         throw e
     } finally {
-        Update or create JIRA issue
+      //  Update or create JIRA issue
         if (config.jiraIssueKey) {
             new jiraUtils().updateJiraIssue(config, config.jiraIssueKey)
         } else {
