@@ -26,7 +26,7 @@ def call(body) {
             new checkoutUtils().checkout(config)
             new java().unitTest(config)
             new java().javaBuild(config)
-            // new sonar().sonarAnalysis(config)
+            new sonar().sonarAnalysis(config)
             
             // Update or create JIRA issue
             // if (config.jiraIssueKey) {
@@ -40,11 +40,11 @@ def call(body) {
         throw e
     } finally {
         // Update or create JIRA issue
-        if (config.jiraIssueKey) {
-            new jiraUtils().updateJiraIssue(config, config.jiraIssueKey)
-        } else {
-            new jiraUtils().createJiraIssue(config)
-        }
+        // if (config.jiraIssueKey) {
+        //     new jiraUtils().updateJiraIssue(config, config.jiraIssueKey)
+        // } else {
+        //     new jiraUtils().createJiraIssue(config)
+        // }
         echo "Pipeline execution completed."
     }
 }

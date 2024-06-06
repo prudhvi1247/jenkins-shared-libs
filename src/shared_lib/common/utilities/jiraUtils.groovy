@@ -10,23 +10,20 @@ def createJiraIssue(config) {
         def summary = "Build completed"
         def description = "The build and tests have completed successfully."
         def issueType = config.jiraIssueType ?: Global.instance.jiraIssueType
+        def credentialsId = Global.instance.jiraCredentialsId
 
-        node(Global.instance.jenkinsAgentJavaName) {
-            def issue = [
-                fields: [
-                    project: [
-                        key: projectKey
-                    ],
-                    summary: summary,
-                    description: description,
-                    issuetype: [
-                        name: issueType
-                    ]
-                ]
-            ]
-
-            def response = jiraNewIssue(issue: issue)
-            echo "Created JIRA issue: ${response.data.key}"
+        withCredentials([usernamePassword(credentialsId: credentialsId, usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PASS')]) {
+            sh """
+                curl -X POST -u $JIRA_USER:$JIRA_PASS -H "Content-Type: application/json" \\
+                --data '{
+                    "fields": {
+                        "project": {"key": "${projectKey}"},
+                        "summary": "${summary}",
+                        "description": "${description}",
+                        "issuetype": {"name": "${issueType}"}
+                    }
+                }' ${Global.instance.jiraUrl}/rest/api/2/issue
+            """
         }
     }
 }
@@ -34,10 +31,15 @@ def createJiraIssue(config) {
 def updateJiraIssue(config, issueKey) {
     stage('Update JIRA Issue') {
         def comment = "The build and tests have completed successfully."
+        def credentialsId = Global.instance.jiraCredentialsId
 
-        node(Global.instance.jenkinsAgentJavaName) {
-            jiraComment(issueKey: issueKey, body: comment)
-            echo "Updated JIRA issue: ${issueKey} with comment: ${comment}"
+        withCredentials([usernamePassword(credentialsId: credentialsId, usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PASS')]) {
+            sh """
+                curl -X POST -u $JIRA_USER:$JIRA_PASS -H "Content-Type: application/json" \\
+                --data '{
+                    "body": "${comment}"
+                }' ${Global.instance.jiraUrl}/rest/api/2/issue/${issueKey}/comment
+            """
         }
     }
 }
