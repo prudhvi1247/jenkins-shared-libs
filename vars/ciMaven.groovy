@@ -40,11 +40,11 @@ def call(body) {
         throw e
     } finally {
       //  Update or create JIRA issue
-    //     if (config.jiraIssueKey) {
-    //         new jiraUtils().updateJiraIssue(config, config.jiraIssueKey)
-    //     } else {
-    //         new jiraUtils().createJiraIssue(config)
-    //     }
-    //     echo "Pipeline execution completed."
-    // }
+        // if (config.jiraIssueKey) {
+        //     new jiraUtils().updateJiraIssue(config, config.jiraIssueKey)
+        // } else {
+        //     new jiraUtils().createJiraIssue(config)
+        // }
+        echo "Pipeline execution completed."
+    }
 }
